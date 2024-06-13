@@ -30,7 +30,7 @@ class ElFarolEnv(Env):
 
     def step(self, action):
         n_attended = sum(action)
-        observation = [n_attended if a else 0 for a in action]
+        observation = n_attended
         reward = [self.reward_func(a, n_attended) for a in action]
 
         self.prev_action = action

@@ -16,17 +16,23 @@ class ElFarolEnv(Env):
         # observe 0 if did not attend, otherwise observe number of agents who atteneded
         self.observation_space = Discrete(n_agents)
         self.reward_range = (b, g)
-
-        def reward_func(action, n_attended):
-            if action == 0:
-                return s
-            elif n_attended <= threshold:
-                return g
-            else:
-                return b
-
-        self.reward_func = reward_func
+        self.threshold = threshold
+        self.s = s
+        self.g = g
+        self.b = b
         self.prev_action = [self.action_space.sample() for _ in range(n_agents)]
+
+    def modify_threshold(self, change):
+        self.threshold = self.threshold + self.threshold * change
+        print("new threshold: " + str(self.threshold) + ", change: " + str(change))
+
+    def reward_func(self, action, n_attended):
+        if action == 0:
+            return self.s
+        elif n_attended <= self.threshold:
+            return self.g
+        else:
+            return self.b
 
     def step(self, action):
         n_attended = sum(action)

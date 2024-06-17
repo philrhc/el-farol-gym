@@ -11,7 +11,6 @@ class FuzzyPureNash(object):
 
     def in_equilibria(self):
         for action_counts in self.action_counts_by_agent.values():
-            print(action_counts)
             if max(action_counts.values()) / float(sum(action_counts.values())) < self.threshold:
                 return False
         return True

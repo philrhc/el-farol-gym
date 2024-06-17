@@ -62,7 +62,6 @@ def iterations_to_equilibrium(agents, env):
     for iter in range(0, 5000000):
         if iter % 50 == 0 and iter > 0:
             modify_threshold(env)
-            print(iter)
             if nash.in_equilibria():
                 return iter
             nash = FuzzyPureNash()
@@ -73,11 +72,12 @@ def iterations_to_equilibrium(agents, env):
     return False
 
 
-threshold_change_chance = 0.5
-threshold_change_limit = 0.5
+threshold_change_chance = 0.3
+threshold_change_limit = 0.3
 n_agents = 100
 env = ElFarolEnv(n_agents=n_agents, threshold=60)
 agents = []
+print("attended, threshold")
 for i in range(0, n_agents):
     agents.append(ErevRothAgent(env.observation_space, env.action_space))
 print(iterations_to_equilibrium(agents, env))

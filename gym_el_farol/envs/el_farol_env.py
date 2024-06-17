@@ -13,7 +13,6 @@ class ElFarolEnv(Env):
 
         self.n_agents = n_agents
         self.action_space = Discrete(2)
-        # observe 0 if did not attend, otherwise observe number of agents who atteneded
         self.observation_space = Discrete(n_agents)
         self.reward_range = (b, g)
         self.threshold = threshold
@@ -41,9 +40,6 @@ class ElFarolEnv(Env):
 
         self.prev_action = action
         return observation, reward, False, ()
-
-    def reset(self):
-        pass
 
     def render(self, mode='human', close=False):
         if mode == 'human':

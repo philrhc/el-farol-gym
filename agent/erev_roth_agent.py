@@ -34,7 +34,7 @@ class ErevRothAgent(object):
             if r < cum:
                 self.prev_action = a
                 return a
-        raise Exception("No value selected", p)
+        raise Exception("No value selected")
 
     def learn(self, reward):
         self.q[self.prev_action] += reward * self.config["learning_rate"]

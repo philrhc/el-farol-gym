@@ -57,7 +57,7 @@ def modify_threshold(env):
         env.modify_threshold(change)
 
 
-def iterations_to_equilibrium(agents, env):
+def iterations_to_equilibrium():
     nash = FuzzyPureNash()
     for iter in range(0, 5000000):
         if iter % 1000 == 0 and iter > 0:
@@ -80,4 +80,4 @@ agents = []
 print("attended, threshold")
 for i in range(0, n_agents):
     agents.append(ErevRothAgent(env.observation_space, env.action_space))
-print(iterations_to_equilibrium(agents, env))
+print(iterations_to_equilibrium())

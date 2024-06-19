@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+
 class FuzzyPureNash(object):
     def __init__(self, threshold=.95):
         self.action_counts_by_agent = defaultdict(lambda: defaultdict(lambda: int()))

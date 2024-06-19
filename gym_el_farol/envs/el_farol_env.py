@@ -7,7 +7,7 @@ from gymnasium.spaces import Discrete
 class ElFarolEnv(Env):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self, n_agents=100, threshold=70, g=5, sg=1, sb=-3, b=-5):
+    def __init__(self, n_agents=100, threshold=60, g=5, sg=1, sb=-3, b=-5):
         if g < sg or sg < sb or sb < b:
             raise Exception("rewards must be ordered g > sg > sb > b")
 

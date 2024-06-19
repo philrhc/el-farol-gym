@@ -6,14 +6,6 @@ from gymnasium.spaces import Discrete
 
 class ErevRothAgent(object):
     def __init__(self, observation_space, action_space, **userconfig):
-        if not isinstance(observation_space, Discrete):
-            raise Exception(
-                'Observation space {} incompatible with {}. (Only supports Discrete observation spaces.)'.format(
-                    observation_space, self))
-        if not isinstance(action_space, Discrete):
-            raise Exception(
-                'Action space {} incompatible with {}. (Only supports Discrete action spaces.)'.format(action_space,
-                                                                                                       self))
         self.observation_space = observation_space
         self.action_space = action_space
         self.config = {

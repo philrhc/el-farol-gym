@@ -1,3 +1,4 @@
+import random
 from collections import defaultdict
 
 import numpy as np
@@ -11,7 +12,7 @@ class EGreedyAgent:
         learning_rate: float = 0.5,
         initial_epsilon: float = 0.2,
         epsilon_decay: float = 0.001,
-        final_epsilon: float = 0.05,
+        final_epsilon: float = 0.01,
         discount_factor: float = 0.95,
 
     ):
@@ -36,10 +37,6 @@ class EGreedyAgent:
         self.final_epsilon = final_epsilon
 
     def act(self) -> int:
-        """
-        Returns the best action with probability (1 - epsilon)
-        otherwise a random action with probability epsilon to ensure exploration.
-        """
         a = None
         if np.random.random() < self.epsilon:
             a = self.action_space.sample()

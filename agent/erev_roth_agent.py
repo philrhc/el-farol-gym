@@ -2,7 +2,6 @@ import random
 from collections import defaultdict
 
 from gymnasium.spaces import Discrete
-from gym_el_farol.envs import ElFarolEnv, FuzzyPureNash
 
 
 class ErevRothAgent(object):
@@ -17,11 +16,11 @@ class ErevRothAgent(object):
                                                                                                        self))
         self.observation_space = observation_space
         self.action_space = action_space
-        self.action_n = action_space.n
         self.config = {
             "init_mean": 1.0,  # Initialize Q values with this mean
             "init_std": 0.0,  # Initialize Q values with this standard deviation
-            "learning_rate": 1.0}
+            "learning_rate": 0.5,
+        }
         self.config.update(userconfig)
         self.q = defaultdict(lambda: random.normalvariate(self.config["init_mean"], self.config["init_std"]))
 
@@ -41,43 +40,3 @@ class ErevRothAgent(object):
         self.q[self.prev_action] += reward * self.config["learning_rate"]
         for key in self.q:
             self.q[key] *= .99
-
-
-def iterate(agents, env):
-    actions = [a.act() for a in agents]
-    obs, reward, _, _ = env.step(actions)
-    for agent, reward in zip(agents, reward):
-        agent.learn(reward)
-    return actions
-
-
-def modify_threshold(env):
-    if random.random() < threshold_change_chance:
-        change = (random.random() - 0.5) * threshold_change_limit
-        env.modify_threshold(change)
-
-
-def iterations_to_equilibrium(agents, env):
-    nash = FuzzyPureNash()
-    for iter in range(0, 5000000):
-        if iter % 50 == 0 and iter > 0:
-            modify_threshold(env)
-            if nash.in_equilibria():
-                return iter
-            nash = FuzzyPureNash()
-        actions = iterate(agents, env)
-        nash.step(actions)
-    for agent in agents:
-        print(agent.q[0] / (agent.q[0] + agent.q[1]))
-    return False
-
-
-threshold_change_chance = 0.3
-threshold_change_limit = 0.3
-n_agents = 100
-env = ElFarolEnv(n_agents=n_agents, threshold=60)
-agents = []
-print("attended, threshold")
-for i in range(0, n_agents):
-    agents.append(ErevRothAgent(env.observation_space, env.action_space))
-print(iterations_to_equilibrium(agents, env))

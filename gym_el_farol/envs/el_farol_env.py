@@ -34,12 +34,11 @@ class ElFarolEnv(Env):
 
     def step(self, action):
         n_attended = sum(action)
-        observation = n_attended
         print(str(n_attended) + ", " + str(self.threshold))
         reward = [self.reward_func(a, n_attended) for a in action]
 
         self.prev_action = action
-        return observation, reward, False, ()
+        return n_attended, reward, False, ()
 
     def render(self, mode='human', close=False):
         if mode == 'human':

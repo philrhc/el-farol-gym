@@ -21,7 +21,7 @@ class ErevRothAgent(object):
         self.config = {
             "init_mean": 1.0,  # Initialize Q values with this mean
             "init_std": 0.0,  # Initialize Q values with this standard deviation
-            "learning_rate": 1.0}
+            "learning_rate": 0.1}
         self.config.update(userconfig)
         self.q = defaultdict(lambda: random.normalvariate(self.config["init_mean"], self.config["init_std"]))
 
@@ -35,7 +35,7 @@ class ErevRothAgent(object):
             if r < cum:
                 self.prev_action = a
                 return a
-        raise Exception("No value selected", p)
+        raise Exception("No value selected")
 
     def learn(self, reward):
         self.q[self.prev_action] += reward * self.config["learning_rate"]
@@ -53,14 +53,14 @@ def iterate(agents, env):
 
 def modify_threshold(env):
     if random.random() < threshold_change_chance:
-        change = (random.random() - 0.5) * threshold_change_limit
+        change = (random.random()) * threshold_change_limit
         env.modify_threshold(change)
 
 
 def iterations_to_equilibrium(agents, env):
     nash = FuzzyPureNash()
     for iter in range(0, 5000000):
-        if iter % 50 == 0 and iter > 0:
+        if iter % 1000 == 0 and iter > 0:
             modify_threshold(env)
             if nash.in_equilibria():
                 return iter
@@ -75,7 +75,7 @@ def iterations_to_equilibrium(agents, env):
 threshold_change_chance = 0.3
 threshold_change_limit = 0.3
 n_agents = 100
-env = ElFarolEnv(n_agents=n_agents, threshold=60)
+env = ElFarolEnv(n_agents=n_agents)
 agents = []
 print("attended, threshold")
 for i in range(0, n_agents):

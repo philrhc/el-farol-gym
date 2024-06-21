@@ -37,7 +37,14 @@ threshold_change_limit = 0.2
 n_agents = 100
 env = ElFarolEnv(n_agents=n_agents, threshold=70)
 agents = []
-print("attended, threshold")
-for i in range(0, n_agents):
-    agents.append(ErevRothAgent(env.observation_space, env.action_space))
-print(iterations_to_equilibrium(agents, env))
+
+
+def main():
+    print("attended, threshold")
+    for i in range(0, n_agents):
+        agents.append(ErevRothAgent(env.observation_space, env.action_space))
+    print(iterations_to_equilibrium(agents, env))
+
+
+if __name__ == '__main__':
+    main()

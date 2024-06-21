@@ -1,8 +1,6 @@
 import random
 from collections import defaultdict
 
-from gymnasium.spaces import Discrete
-
 
 class ErevRothAgent(object):
     def __init__(self, observation_space, action_space, **userconfig):

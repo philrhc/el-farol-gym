@@ -15,7 +15,7 @@ def iterate(agents, env):
 
 def modify_threshold():
     if random.random() < threshold_change_chance:
-        change = (random.random() - 0.5) * threshold_change_limit
+        change = (random.random()) * threshold_change_limit
         env.modify_threshold(change)
 
 
@@ -32,12 +32,12 @@ def iterations_to_equilibrium(agents, env):
     return False
 
 
-threshold_change_chance = 0.3
-threshold_change_limit = 0.3
+threshold_change_chance = 0.2
+threshold_change_limit = 0.2
 n_agents = 100
 env = ElFarolEnv(n_agents=n_agents, threshold=70)
 agents = []
 print("attended, threshold")
 for i in range(0, n_agents):
-    agents.append(EGreedyAgent(env.observation_space, env.action_space))
+    agents.append(ErevRothAgent(env.observation_space, env.action_space))
 print(iterations_to_equilibrium(agents, env))

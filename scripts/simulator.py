@@ -15,13 +15,13 @@ def iterate(agents, env):
 
 def modify_threshold():
     if random.random() < threshold_change_chance:
-        change = (random.random()) * threshold_change_limit
+        change = (random.random() - 0.5) * threshold_change_limit
         env.modify_threshold(change)
 
 
 def iterations_to_equilibrium(agents, env):
     nash = FuzzyPureNash()
-    for iter in range(0, 5000000):
+    for iter in range(0, 10000):
         if iter % 50 == 0 and iter > 0:
             modify_threshold()
             if nash.in_equilibria():
@@ -42,8 +42,8 @@ agents = []
 def main():
     print("attended, threshold")
     for i in range(0, n_agents):
-        agents.append(ErevRothAgent(env.observation_space, env.action_space))
-    print(iterations_to_equilibrium(agents, env))
+        agents.append(EGreedyAgent(env.observation_space, env.action_space))
+    iterations_to_equilibrium(agents, env)
 
 
 if __name__ == '__main__':

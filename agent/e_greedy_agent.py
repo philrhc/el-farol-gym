@@ -1,18 +1,15 @@
 import random
-from collections import defaultdict
-
 import numpy as np
 
 
 class EGreedyAgent(object):
-    def __init__(self, observation_space, action_space, **userconfig):
-        self.observation_space = observation_space
+    def __init__(self, action_space, **userconfig):
         self.action_space = action_space
         self.config = {
-            "learning_rate": 0.5,
-            "initial_epsilon": 0.5,
-            "epsilon_decay": 0.01,
-            "final_epsilon": 0.1
+            "learning_rate": 1,  # Reward multiplier
+            "initial_epsilon": 0.5,  # Exploration probability
+            "epsilon_decay": 0.001,  # Exploration reduction over time
+            "final_epsilon": 0.1  # Final exploration probability
         }
         self.config.update(userconfig)
         self.q = [0, 0]

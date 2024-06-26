@@ -42,7 +42,7 @@ agents = []
 def main():
     print("attended, threshold")
     for i in range(0, n_agents):
-        agents.append(EGreedyAgent(env.observation_space, env.action_space))
+        agents.append(EGreedyAgent(env.action_space))
     iterations_to_equilibrium(agents, env)
 
 

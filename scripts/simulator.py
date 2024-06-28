@@ -1,8 +1,8 @@
 import random
 
 from agent.e_greedy_agent import EGreedyAgent
-from gym_el_farol.envs import ElFarolEnv, FuzzyPureNash
 from agent.erev_roth_agent import ErevRothAgent
+from environment import ElFarolEnv, FuzzyPureNash
 
 
 def iterate(agents, env):
@@ -19,12 +19,12 @@ def modify_threshold():
         env.modify_threshold(change)
 
 
-def iterations_to_equilibrium(agents, env):
+def iterations_to_equilibrium(agents, env, to_nash=False):
     nash = FuzzyPureNash()
     for iter in range(0, 10000):
         if iter % 50 == 0 and iter > 0:
             modify_threshold()
-            if nash.in_equilibria():
+            if to_nash and nash.in_equilibria():
                 return iter
             nash = FuzzyPureNash()
         actions = iterate(agents, env)
@@ -32,7 +32,7 @@ def iterations_to_equilibrium(agents, env):
     return False
 
 
-threshold_change_chance = 0.2
+threshold_change_chance = 0.3
 threshold_change_limit = 0.2
 n_agents = 100
 env = ElFarolEnv(n_agents=n_agents, threshold=70)
@@ -42,7 +42,7 @@ agents = []
 def main():
     print("attended, threshold")
     for i in range(0, n_agents):
-        agents.append(EGreedyAgent(env.action_space))
+        agents.append(ErevRothAgent(env.action_space))
     iterations_to_equilibrium(agents, env)
 
 

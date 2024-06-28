@@ -5,8 +5,6 @@ from gymnasium.spaces import Discrete
 
 
 class ElFarolEnv(Env):
-    metadata = {'render.modes': ['human']}
-
     def __init__(self, n_agents=100, threshold=60, g=10, sg=5, sb=1, b=1):
         if g < sg or sg < sb or sb < b:
             raise Exception("rewards must be ordered g > sg > sb > b")
@@ -42,7 +40,3 @@ class ElFarolEnv(Env):
         reward = [self.reward_func(a, n_attended) for a in action]
         self.prev_action = action
         return n_attended, reward, False, ()
-
-    def render(self, mode='human', close=False):
-        if mode == 'human':
-            print(str(sum(self.prev_action)))

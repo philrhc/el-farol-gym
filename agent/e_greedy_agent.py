@@ -7,9 +7,9 @@ class EGreedyAgent(object):
         self.action_space = action_space
         self.config = {
             "learning_rate": 1,  # Reward multiplier
-            "initial_epsilon": 0.5,  # Exploration probability
+            "initial_epsilon": 0.2,  # Exploration probability
             "epsilon_decay": 0.001,  # Exploration reduction over time
-            "final_epsilon": 0.1  # Final exploration probability
+            "final_epsilon": 0.01  # Final exploration probability
         }
         self.config.update(userconfig)
         self.q = [0, 0]

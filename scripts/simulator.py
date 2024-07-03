@@ -40,11 +40,10 @@ agents = []
 
 
 def main():
-    print("attended, threshold")
     for i in range(0, n_agents):
         agents.append(ErevRothAgent(env.action_space))
     iterations_to_equilibrium(agents, env)
-
+    env.plot_attendance_and_threshold()
 
 if __name__ == '__main__':
     main()

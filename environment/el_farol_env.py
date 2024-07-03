@@ -2,6 +2,8 @@ from __future__ import print_function
 
 from gymnasium import Env
 from gymnasium.spaces import Discrete
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 class ElFarolEnv(Env):
@@ -11,32 +13,45 @@ class ElFarolEnv(Env):
 
         self.n_agents = n_agents
         self.action_space = Discrete(2)
-        self.observation_space = Discrete(n_agents)
         self.reward_range = (b, g)
         self.threshold = threshold
-        self.sg = sg
-        self.sb = sb
-        self.g = g
-        self.b = b
-        self.prev_action = [self.action_space.sample() for _ in range(n_agents)]
+
+        def reward_func(action, n_attended):
+            if action == 0:
+                if n_attended >= self.threshold:
+                    return sg
+                if n_attended < self.threshold:
+                    return sb
+            elif n_attended <= self.threshold:
+                return g
+            else:
+                return b
+
+        self.reward_func = reward_func
+        self.attendances = []
+        self.thresholds = []
 
     def modify_threshold(self, change):
         self.threshold = int(self.threshold + self.threshold * change)
 
-    def reward_func(self, action, n_attended):
-        if action == 0:
-            if n_attended >= self.threshold:
-                return self.sg
-            if n_attended < self.threshold:
-                return self.sb
-        elif n_attended <= self.threshold:
-            return self.g
-        else:
-            return self.b
-
     def step(self, action):
         n_attended = sum(action)
-        print(str(n_attended) + ", " + str(self.threshold))
         reward = [self.reward_func(a, n_attended) for a in action]
-        self.prev_action = action
+        self.attendances.append(n_attended)
+        self.thresholds.append(self.threshold)
         return n_attended, reward, False, ()
+
+    def plot_attendance_and_threshold(self):
+        t = np.arange(0.0, 10_000, 1)
+        fig, axs = plt.subplots(2, 1, layout='constrained')
+        axs[0].plot(t, self.attendances)
+        axs[0].plot(t, self.thresholds)
+        axs[0].set(xlabel='timesteps', ylabel="number of agents", title="Attendance/Threshold")
+        axs[0].grid()
+
+        mse = ((np.array(self.attendances) - np.array(self.thresholds)) ** 2)
+        axs[1].plot(t, mse)
+        axs[1].set(title="Squared Error", xlabel='timesteps')
+        axs[1].grid()
+
+        plt.show()

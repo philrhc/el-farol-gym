@@ -13,17 +13,17 @@ def iterate(agents, env):
     return actions
 
 
-def modify_threshold():
-    if random.random() < threshold_change_chance:
-        change = (random.random() - 0.5) * threshold_change_limit
-        env.modify_threshold(change)
+def modify_capacity():
+    if random.random() < capacity_change_chance:
+        change = (random.random() - 0.5) * capacity_change_limit
+        env.modify_capacity(change)
 
 
 def iterations_to_equilibrium(agents, env, to_nash=False):
     nash = FuzzyPureNash()
     for iter in range(0, 10000):
         if iter % 50 == 0 and iter > 0:
-            modify_threshold()
+            modify_capacity()
             if to_nash and nash.in_equilibria():
                 return iter
             nash = FuzzyPureNash()
@@ -32,18 +32,18 @@ def iterations_to_equilibrium(agents, env, to_nash=False):
     return False
 
 
-threshold_change_chance = 0.3
-threshold_change_limit = 0.2
+capacity_change_chance = 0.1
+capacity_change_limit = 0.2
 n_agents = 100
-env = ElFarolEnv(n_agents=n_agents, threshold=70)
+env = ElFarolEnv(n_agents=n_agents, capacity=70)
 agents = []
 
 
 def main():
     for i in range(0, n_agents):
-        agents.append(ErevRothAgent(env.action_space))
+        agents.append(EGreedyAgent(env.action_space))
     iterations_to_equilibrium(agents, env)
-    env.plot_attendance_and_threshold()
+    env.plot_attendance_and_capacity()
 
 if __name__ == '__main__':
     main()

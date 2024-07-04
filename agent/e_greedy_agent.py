@@ -8,7 +8,7 @@ class EGreedyAgent(object):
         self.action_space = action_space
         self.config = {
             "learning_rate": 0.5,  # Reward multiplier
-            "forget_rate": 0.8,    # Forget some past experience
+            "retention_rate": 0.8,    # Forget some past experience
             "initial_epsilon": 0.5,  # Exploration probability
             "epsilon_decay": 0.01,  # Exploration reduction over time
             "final_epsilon": 0.01  # Final exploration probability
@@ -33,7 +33,7 @@ class EGreedyAgent(object):
 
     def forget(self):
         for x in range(2):
-            self.q[x] *= self.config["forget_rate"]
+            self.q[x] *= self.config["retention_rate"]
 
     def decay_epsilon(self):
         self.epsilon = max(self.config["final_epsilon"], self.epsilon - self.config["epsilon_decay"])

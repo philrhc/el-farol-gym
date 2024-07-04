@@ -7,7 +7,7 @@ import numpy as np
 
 
 class ElFarolEnv(Env):
-    def __init__(self, n_agents=100, capacity=60, g=10, sg=5, sb=1, b=1):
+    def __init__(self, n_agents=100, capacity=70, g=10, sg=5, sb=1, b=1):
         if g < sg or sg < sb or sb < b:
             raise Exception("rewards must be ordered g > sg > sb > b")
 
@@ -41,8 +41,8 @@ class ElFarolEnv(Env):
         self.capacities.append(self.capacity)
         return n_attended, reward, False, ()
 
-    def plot_attendance_and_capacity(self):
-        t = np.arange(0.0, 10_000, 1)
+    def plot_attendance_and_capacity(self, iterations):
+        t = np.arange(0.0, iterations, 1)
         fig, axs = plt.subplots(2, 1, layout='constrained')
         axs[0].plot(t, self.attendances)
         axs[0].plot(t, self.capacities)

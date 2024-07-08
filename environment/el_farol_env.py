@@ -7,14 +7,11 @@ import numpy as np
 
 
 class ElFarolEnv(Env):
-    def __init__(self, n_agents=100, capacity=70, g=10, sg=5, sb=1, b=1):
-        if g < sg or sg < sb or sb < b:
-            raise Exception("rewards must be ordered g > sg > sb > b")
-
+    def __init__(self, n_agents, init_capacity, g, sg, sb, b):
         self.n_agents = n_agents
         self.action_space = Discrete(2)
         self.reward_range = (b, g)
-        self.capacity = capacity
+        self.capacity = init_capacity
 
         def reward_func(action, n_attended):
             if action == 0:
@@ -31,8 +28,11 @@ class ElFarolEnv(Env):
         self.attendances = []
         self.capacities = []
 
-    def modify_capacity(self, change):
-        self.capacity = int(self.capacity + self.capacity * change)
+    def modify_capacity_by_percentage(self, percentage_change):
+        self.capacity = int(self.capacity + self.capacity * percentage_change)
+
+    def modify_capacity(self, new):
+        self.capacity = new
 
     def step(self, action):
         n_attended = sum(action)
@@ -40,6 +40,13 @@ class ElFarolEnv(Env):
         self.attendances.append(n_attended)
         self.capacities.append(self.capacity)
         return n_attended, reward, False, ()
+
+    def mse(self):
+        squared_error = ((np.array(self.attendances) - np.array(self.capacities)) ** 2)
+        sum = 0
+        for each in squared_error:
+            sum += each
+        return sum / len(squared_error)
 
     def plot_attendance_and_capacity(self, iterations):
         t = np.arange(0.0, iterations, 1)
@@ -49,8 +56,8 @@ class ElFarolEnv(Env):
         axs[0].set(xlabel='timesteps', ylabel="number of agents", title="Attendance/Capacity")
         axs[0].grid()
 
-        mse = ((np.array(self.attendances) - np.array(self.capacities)) ** 2)
-        axs[1].plot(t, mse)
+        squared_error = ((np.array(self.attendances) - np.array(self.capacities)) ** 2)
+        axs[1].plot(t, squared_error)
         axs[1].set(title="Squared Error", xlabel='timesteps')
         axs[1].grid()
 

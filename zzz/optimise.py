@@ -11,7 +11,6 @@ search_space.append(Real(0, 10, name="sg"))
 search_space.append(Real(0, 10, name="sb"))
 search_space.append(Real(0, 10, name="b"))
 search_space.append(Real(0, 1, name="learning_rate"))
-search_space.append(Real(0, 1, name="retention_rate"))
 search_space.append(Real(0, 0.5, name="initial_epsilon"))
 search_space.append(Real(0, 0.1, name="epsilon_decay"))
 search_space.append(Real(0, 0.2, name="final_epsilon"))
@@ -22,7 +21,6 @@ initial_params = {
     "sb": 0.01,
     "b": 0.01,
     "learning_rate": 0.9,
-    "retention_rate": 0.8,
     "initial_epsilon": 0.5,
     "epsilon_decay": 0.01,
     "final_epsilon": 0.01
@@ -32,13 +30,13 @@ initial_params = {
 def run_simulation(params):
     return simulate.simulate_egreedy(
         False,
-        simulate.run_with_static_threshold,
+        simulate.one_threshold_change,
         params["g"],
         params["sg"],
         params["sb"],
         params["b"],
         params["learning_rate"],
-        params["retention_rate"],
+        1,
         params["initial_epsilon"],
         params["epsilon_decay"],
         params["final_epsilon"]

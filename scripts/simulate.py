@@ -86,15 +86,15 @@ def simulate_erevroth(visualise=False,
 
 def simulate_egreedy(visualise=False,
                      simulation=random_threshold_changes,
-                     g=9.728167623959077,
-                     sg=10.0,
-                     sb=0,
-                     b=5.6432682959107545,
-                     learning_rate=0.5204324952407218,
-                     retention_rate=0.4825011608055964,
-                     initial_epsilon=0.5,
-                     epsilon_decay=0.09057920037111432,
-                     final_epsilon=0.015206583961916596):
+                     g=20,
+                     sg=9.38,
+                     sb=2.739760371150226,
+                     b=1.6782890889750117,
+                     learning_rate=0.8769506278547066,
+                     retention_rate=0.27681798313910244,
+                     initial_epsilon=0.48904103108688907,
+                     epsilon_decay=0.014380608025918491,
+                     final_epsilon=0):
     env = ElFarolEnv(
         n_agents=n_agents,
         init_capacity=init_capacity,
@@ -117,4 +117,4 @@ def simulate_egreedy(visualise=False,
 
 
 if __name__ == '__main__':
-    print(simulate_erevroth(True, random_threshold_changes))
+    print(simulate_egreedy(True, one_threshold_change))

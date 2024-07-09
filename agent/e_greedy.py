@@ -19,13 +19,9 @@ class EGreedyAgent(object):
         return a
 
     def learn(self, reward):
-        self.q[self.prev_action] += reward * self.config["learning_rate"]
-        self.forget()
+        self.q[self.prev_action] = ((reward * self.config["learning_rate"] * self.config["retention_rate"])
+                                    + (1 - self.config["retention_rate"]) * self.q[self.prev_action])
         self.decay_epsilon()
-
-    def forget(self):
-        for x in range(2):
-            self.q[x] *= self.config["retention_rate"]
 
     def decay_epsilon(self):
         self.epsilon = max(self.config["final_epsilon"], self.epsilon - self.config["epsilon_decay"])

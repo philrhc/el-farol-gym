@@ -117,4 +117,4 @@ def simulate_egreedy(visualise=False,
 
 
 if __name__ == '__main__':
-    print(simulate_egreedy(True, one_threshold_change))
+    print(simulate_egreedy(True, random_threshold_changes))

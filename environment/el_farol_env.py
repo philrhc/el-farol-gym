@@ -9,9 +9,10 @@ import numpy as np
 class ElFarolEnv(Env):
     def __init__(self, n_agents, init_capacity, g, sg, sb, b):
         self.n_agents = n_agents
-        self.action_space = Discrete(2)
-        self.reward_range = (b, g)
+        self.action_space = Discrete(2) # used by agents when sampling action space
         self.capacity = init_capacity
+        self.attendances = []
+        self.capacities = []
 
         def reward_func(action, n_attended):
             if action == 0:
@@ -25,8 +26,6 @@ class ElFarolEnv(Env):
                 return b
 
         self.reward_func = reward_func
-        self.attendances = []
-        self.capacities = []
 
     def modify_capacity_by_percentage(self, percentage_change):
         self.capacity = int(self.capacity + self.capacity * percentage_change)

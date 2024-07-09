@@ -1,16 +1,22 @@
 from __future__ import print_function
 
-from gymnasium import Env
-from gymnasium.spaces import Discrete
+import gymnasium as gym
+import numpy
+from gymnasium.vector import VectorEnv
+from gymnasium.spaces import Discrete, Box
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-class ElFarolEnv(Env):
+class MultipleBarsEnv(VectorEnv):
     def __init__(self, n_agents, init_capacity, g, s, b, capacity_change):
+        observation_space = Box(low=0, high=n_agents, dtype=np.int8)
+        action_space = Box(low=0, high=1, dtype=np.int8)
+        super().__init__(len(init_capacity), observation_space, action_space)
+        if len(init_capacity) != len(capacity_change):
+            raise Exception("init capacities and change not equal")
         self.i = 0
         self.n_agents = n_agents
-        self.action_space = Discrete(2) # used by agents when sampling action space
         self.capacity = init_capacity
         self.capacity_change = capacity_change
         self.attendances = []
@@ -32,14 +38,21 @@ class ElFarolEnv(Env):
     def modify_capacity(self, new):
         self.capacity = new
 
-    def step(self, action):
+    def step(self, actions):
         self.i += 1
-        n_attended = sum(action)
-        reward = [self.reward_func(a, n_attended) for a in action]
-        self.attendances.append(n_attended)
-        self.capacities.append(self.capacity)
-        self.capacity_change(self)
-        return n_attended, reward, False, ()
+        observations = []
+        step_attendances = []
+        step_capacities = []
+        for i in range(self.num_envs):
+            n_attended = sum(actions[i])
+            reward = [self.reward_func(a, n_attended) for a in actions[i:]]
+            self.attendances.append(n_attended)
+            self.capacities.append(self.capacity)
+            self.capacity_change[i](self)
+            observations.append((n_attended, reward, False, ()))
+        self.attendances.append(step_attendances)
+        self.capacities.append(step_capacities)
+        return observations
 
     def mse(self):
         squared_error = ((np.array(self.attendances) - np.array(self.capacities)) ** 2)

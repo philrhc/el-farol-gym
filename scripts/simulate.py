@@ -1,39 +1,12 @@
 import random
 
+import numpy as np
+from gymnasium.spaces import Box
+
 from agent.e_greedy import EGreedyAgent
 from agent.simple_erev_roth import SimpleErevRothAgent
 from agent.erev_roth import ErevRothAgent
-from environment import ElFarolEnv
-
-
-def iterate(agents, env):
-    actions = [a.act() for a in agents]
-    obs, reward, _, _ = env.step(actions)
-    for agent, reward in zip(agents, reward):
-        agent.learn(reward)
-    return actions
-
-
-def random_threshold_changes(agents, env, iterations):
-    for i in range(0, iterations):
-        if i % 50 == 0 and i > 0:
-            if random.random() < capacity_change_chance:
-                change = (random.random() - 0.5) * capacity_change_limit
-                env.modify_capacity_by_percentage(change)
-        iterate(agents, env)
-
-
-def static_threshold(agents, env, iterations):
-    for i in range(0, iterations):
-        iterate(agents, env)
-
-
-def one_threshold_change(agents, env, iterations):
-    for i in range(0, iterations):
-        if i == int(iterations / 2):
-            env.modify_capacity(50)
-        iterate(agents, env)
-
+from environment import ElFarolEnv, MultipleBarsEnv
 
 iterations = 10_000
 n_agents = 100
@@ -42,21 +15,34 @@ capacity_change_chance = 0.2
 capacity_change_limit = 0.3
 
 
-def simulate(agents,
-             env,
-             visualise=False,
-             simulation=random_threshold_changes):
-    simulation(agents, env, iterations)
-    if visualise:
-        env.plot_attendance_and_capacity(iterations)
-    return env.mse()
+def no_capacity_change(env):
+    return
+
+
+def one_change(env):
+    if env.i == int(iterations / 2):
+        env.modify_capacity(50)
+
+
+def random_change(env):
+    if env.i % 50 == 0 and env.i > 0:
+        if random.random() < capacity_change_chance:
+            change = (random.random() - 0.5) * capacity_change_limit
+            env.modify_capacity_by_percentage(change)
+
+
+def iterate(agents, env):
+    actions = [a.act() for a in agents]
+    observations, rewards, _, _, = env.step(actions)
+    for agent, reward in zip(agents, rewards):
+        agent.learn(reward)
+    return actions
 
 
 def simulate_erevroth(visualise=False,
-                      simulation=static_threshold,
+                      capacity_change_func=random_change,
                       g=10.0,
-                      sg=5,
-                      sb=5,
+                      s=5,
                       b=1,
                       learning_rate=0.001,
                       phi=0.4028566874373059,
@@ -66,8 +52,7 @@ def simulate_erevroth(visualise=False,
         n_agents=n_agents,
         init_capacity=init_capacity,
         g=g,
-        sg=sg,
-        sb=sb,
+        s=s,
         b=b)
     agents = []
     for i in range(0, n_agents):
@@ -81,31 +66,33 @@ def simulate_erevroth(visualise=False,
                               "epsilon": epsilon,
                               "retention_rate": retention_rate
                           }))
-    return simulate(agents, env, visualise, simulation)
+    for i in range(0, iterations):
+        iterate(agents, env)
+    if visualise:
+        env.plot_attendance_and_capacity(iterations)
+    return env.mse()
 
 
 def simulate_egreedy(visualise=False,
-                     simulation=random_threshold_changes,
-                     g=20,
-                     sg=9.38,
-                     sb=2.739760371150226,
-                     b=1.6782890889750117,
-                     learning_rate=0.8769506278547066,
-                     retention_rate=0.27681798313910244,
-                     initial_epsilon=0.48904103108688907,
-                     epsilon_decay=0.014380608025918491,
-                     final_epsilon=0):
+                     capacity_change_func=random_change,
+                     g=10,
+                     s=5,
+                     b=1,
+                     learning_rate=1,
+                     retention_rate=0.02006827976496192,
+                     initial_epsilon=0.5,
+                     epsilon_decay=0.00698608772471109,
+                     final_epsilon=0.17041582725849416):
     env = ElFarolEnv(
         n_agents=n_agents,
         init_capacity=init_capacity,
         g=g,
-        sg=sg,
-        sb=sb,
-        b=b)
+        s=s,
+        b=b,
+        capacity_change=capacity_change_func)
     agents = []
     for i in range(0, n_agents):
-        agents.append(
-            EGreedyAgent(action_space=env.action_space,
+        agents.append(EGreedyAgent(action_space=env.action_space,
                          config={
                              "learning_rate": learning_rate,  # Reward multiplier
                              "retention_rate": retention_rate,  # Forget some past experience
@@ -113,8 +100,35 @@ def simulate_egreedy(visualise=False,
                              "epsilon_decay": epsilon_decay,  # Exploration reduction over time
                              "final_epsilon": final_epsilon  # Final exploration probability
                          }))
-    return simulate(agents, env, visualise, simulation)
+    for i in range(0, iterations):
+        iterate(agents, env)
+    if visualise:
+        env.plot_attendance_and_capacity(iterations)
+    return env.mse()
 
+
+def multiple_bars():
+    env = MultipleBarsEnv(
+        n_agents=n_agents,
+        init_capacity=[5],
+        g=10,
+        s=5,
+        b=1,
+        capacity_change=[no_capacity_change])
+    agents = []
+    for i in range(0, 2):
+        agents.append(EGreedyAgent(action_space=env.action_space,
+                                   config={
+                                       "learning_rate": 1,  # Reward multiplier
+                                       "retention_rate": 1,  # Forget some past experience
+                                       "initial_epsilon": 1,  # Exploration probability
+                                       "epsilon_decay": 0,  # Exploration reduction over time
+                                       "final_epsilon": 1  # Final exploration probability
+                                   }))
+    for i in range(0, iterations):
+        iterate(agents, env)
+    env.plot_attendance_and_capacity(iterations)
+    return env.mse()
 
 if __name__ == '__main__':
-    print(simulate_egreedy(True, random_threshold_changes))
+    print(multiple_bars())

@@ -3,15 +3,9 @@ from collections import defaultdict
 
 
 class ErevRothAgent(object):
-    def __init__(self, action_space, **userconfig):
+    def __init__(self, action_space, config):
         self.action_space = action_space
-        self.config = {
-            "init_mean": 1.0,  # Initialize Q values with this mean
-            "init_std": 0.0,  # Initialize Q values with this standard deviation
-            "learning_rate": 0.5,  # Reward multiplier
-            "forget_rate": 0.99  # Increase reaction speed to dynamic environment
-        }
-        self.config.update(userconfig)
+        self.config = config
         self.q = defaultdict(lambda: random.normalvariate(self.config["init_mean"], self.config["init_std"]))
 
     def act(self):
@@ -26,6 +20,6 @@ class ErevRothAgent(object):
         raise Exception("No value selected")
 
     def learn(self, reward):
-        self.q[self.prev_action] += reward * self.config["learning_rate"]
-        for key in self.q:
-            self.q[key] *= self.config["forget_rate"]
+        other_action = 1 - self.prev_action
+        self.q[self.prev_action] = (1 - self.config["phi"]) * self.q[self.prev_action] + reward * (1 - self.config["epsilon"])
+        self.q[other_action] = (1 - self.config["phi"]) * self.q[other_action] + reward * self.config["epsilon"]

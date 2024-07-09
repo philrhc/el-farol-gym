@@ -26,10 +26,10 @@ class ElFarolEnv(Env):
 
         self.reward_func = reward_func
 
-    def modify_capacity_by_percentage(self, percentage_change):
+    def modify_capacity_by_percentage(self, percentage_change, index):
         self.capacity = int(self.capacity + self.capacity * percentage_change)
 
-    def modify_capacity(self, new):
+    def modify_capacity(self, index, new):
         self.capacity = new
 
     def step(self, action):

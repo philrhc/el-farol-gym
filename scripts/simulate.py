@@ -15,27 +15,31 @@ capacity_change_chance = 0.2
 capacity_change_limit = 0.3
 
 
-def no_capacity_change(env):
+def no_capacity_change(env, i):
     return
 
 
-def one_change(env):
+def one_change(env, i):
     if env.i == int(iterations / 2):
-        env.modify_capacity(50)
+        env.modify_capacity(50, i)
 
 
-def random_change(env):
+def random_change(env, i):
     if env.i % 50 == 0 and env.i > 0:
         if random.random() < capacity_change_chance:
             change = (random.random() - 0.5) * capacity_change_limit
-            env.modify_capacity_by_percentage(change)
+            env.modify_capacity_by_percentage(change, i)
 
 
 def iterate(agents, env):
     actions = [a.act() for a in agents]
-    observations, rewards, _, _, = env.step(actions)
-    for agent, reward in zip(agents, rewards):
-        agent.learn(reward)
+    transposed = np.transpose(actions)
+    step = env.step(transposed)
+    for agent_index, agent in enumerate(agents):
+        reward_array = []
+        for observations, rewards, _, _, in step:
+            reward_array.append(rewards[agent_index])
+        agent.learn(reward_array)
     return actions
 
 

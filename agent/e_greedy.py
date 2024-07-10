@@ -21,8 +21,9 @@ class EGreedyAgent(object):
 
     def learn(self, reward):
         for index, each in enumerate(reward):
-            self.q[index][self.prev_action] = ((each * self.config["learning_rate"] * self.config["retention_rate"])
-                                        + (1 - self.config["retention_rate"]) * self.q[index][self.prev_action])
+            self.q[index][self.prev_action[index]] = (
+                        (each * self.config["learning_rate"] * self.config["retention_rate"])
+                        + (1 - self.config["retention_rate"]) * self.q[index][self.prev_action[index]])
             self.decay_epsilon()
 
     def decay_epsilon(self):

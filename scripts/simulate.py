@@ -7,6 +7,7 @@ from agent.simple_erev_roth import SimpleErevRothAgent
 from agent.erev_roth import ErevRothAgent
 from environment import ElFarolEnv, MultipleBarsEnv
 import capacity_changes
+import hyperparams
 
 iterations = 10_000
 n_agents = 100
@@ -27,101 +28,19 @@ def iterate(agents, env):
     return actions
 
 
-def simulate_erevroth(visualise=False,
-                      capacity_change_func=capacity_changes.no_capacity_change,
-                      g=10.0,
-                      s=5,
-                      b=1,
-                      learning_rate=0.001,
-                      phi=0.4028566874373059,
-                      epsilon=0.003955266345682853,
-                      retention_rate=1):
-    env = ElFarolEnv(
-        n_agents=n_agents,
-        init_capacity=[init_capacity],
-        g=g,
-        s=s,
-        b=b,
-        capacity_change=[capacity_change_func])
-    agents = []
-    for i in range(0, n_agents):
-        agents.append(
-            ErevRothAgent(action_space=env.action_space,
-                          config={
-                              "init_mean": 1,
-                              "init_std": 0,
-                              "learning_rate": learning_rate,  # Reward multiplier
-                              "phi": phi,
-                              "epsilon": epsilon,
-                              "retention_rate": retention_rate
-                          }))
-    for i in range(0, iterations):
-        iterate(agents, env)
-    if visualise:
-        env.plot_attendance_and_capacity(iterations)
-    return env.mse()
-
-
-def simulate_egreedy(visualise=False,
-                     capacity_change_func=capacity_changes.no_capacity_change,
-                     g=10,
-                     s=5,
-                     b=1,
-                     learning_rate=1,
-                     retention_rate=0.02006827976496192,
-                     initial_epsilon=0.5,
-                     epsilon_decay=0.00698608772471109,
-                     final_epsilon=0.17041582725849416):
-    env = ElFarolEnv(
-        n_agents=n_agents,
-        init_capacity=[init_capacity],
-        g=g,
-        s=s,
-        b=b,
-        capacity_change=[capacity_change_func])
-    agents = []
-    for i in range(0, n_agents):
-        agents.append(EGreedyAgent(action_space=env.action_space,
-                                   config={
-                                       "learning_rate": learning_rate,  # Reward multiplier
-                                       "retention_rate": retention_rate,  # Forget some past experience
-                                       "initial_epsilon": initial_epsilon,  # Exploration probability
-                                       "epsilon_decay": epsilon_decay,  # Exploration reduction over time
-                                       "final_epsilon": final_epsilon  # Final exploration probability
-                                   }))
-    for i in range(0, iterations):
-        iterate(agents, env)
-    if visualise:
-        env.plot_attendance_and_capacity(iterations)
-    return env.mse()
-
-
-def multiple_bars(visualise=False,
-                  learning_rate=1,
-                  retention_rate=0.02006827976496192,
-                  initial_epsilon=0.5,
-                  epsilon_decay=0.00698608772471109,
-                  final_epsilon=0.17041582725849416):
+def simulate(visualise=False,
+             agent_type=EGreedyAgent,
+             config=hyperparams.e_greedy_optimal):
     env = MultipleBarsEnv(
         n_agents=n_agents,
         init_capacity=[70, 15],
         capacity_change=[capacity_changes.no_capacity_change, capacity_changes.no_capacity_change])
-    agents = []
-    for i in range(0, n_agents):
-        agents.append(EGreedyAgent(action_space=env.action_space,
-                                   config={
-                                       "learning_rate": learning_rate,  # Reward multiplier
-                                       "retention_rate": retention_rate,  # Forget some past experience
-                                       "initial_epsilon": initial_epsilon,  # Exploration probability
-                                       "epsilon_decay": epsilon_decay,  # Exploration reduction over time
-                                       "final_epsilon": final_epsilon  # Final exploration probability
-                                   }))
-    for i in range(0, iterations):
-        iterate(agents, env)
+    agents = [agent_type(action_space=env.action_space, config=config) for _ in range(0, n_agents)]
+    [iterate(agents, env) for _ in range(0, iterations)]
     if visualise:
         env.plot_attendance_and_capacity(iterations)
     return env.mse()
 
 
 if __name__ == '__main__':
-    print(multiple_bars(True))
+    print(simulate(True, ErevRothAgent, hyperparams.erev_roth_optimal))

@@ -9,7 +9,7 @@ import numpy as np
 
 
 def squared(a, b):
-    return np.array(a) - np.array(b) ** 2
+    return np.square(np.array(a) - np.array(b))
 
 
 class MultipleBarsEnv(VectorEnv):

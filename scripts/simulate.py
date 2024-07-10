@@ -6,28 +6,13 @@ from agent.e_greedy import EGreedyAgent
 from agent.simple_erev_roth import SimpleErevRothAgent
 from agent.erev_roth import ErevRothAgent
 from environment import ElFarolEnv, MultipleBarsEnv
+import capacity_changes
 
 iterations = 10_000
 n_agents = 100
 init_capacity = 70
 capacity_change_chance = 0.2
 capacity_change_limit = 0.3
-
-
-def no_capacity_change(env, i):
-    return
-
-
-def one_change(env, i):
-    if env.i == int(iterations / 2):
-        env.modify_capacity(50, i)
-
-
-def random_change(env, i):
-    if env.i % 50 == 0 and env.i > 0:
-        if random.random() < capacity_change_chance:
-            change = (random.random() - 0.5) * capacity_change_limit
-            env.modify_capacity_by_percentage(change, i)
 
 
 def iterate(agents, env):
@@ -43,7 +28,7 @@ def iterate(agents, env):
 
 
 def simulate_erevroth(visualise=False,
-                      capacity_change_func=random_change,
+                      capacity_change_func=capacity_changes.no_capacity_change,
                       g=10.0,
                       s=5,
                       b=1,
@@ -53,10 +38,11 @@ def simulate_erevroth(visualise=False,
                       retention_rate=1):
     env = ElFarolEnv(
         n_agents=n_agents,
-        init_capacity=init_capacity,
+        init_capacity=[init_capacity],
         g=g,
         s=s,
-        b=b)
+        b=b,
+        capacity_change=[capacity_change_func])
     agents = []
     for i in range(0, n_agents):
         agents.append(
@@ -77,7 +63,7 @@ def simulate_erevroth(visualise=False,
 
 
 def simulate_egreedy(visualise=False,
-                     capacity_change_func=random_change,
+                     capacity_change_func=capacity_changes.no_capacity_change,
                      g=10,
                      s=5,
                      b=1,
@@ -88,11 +74,11 @@ def simulate_egreedy(visualise=False,
                      final_epsilon=0.17041582725849416):
     env = ElFarolEnv(
         n_agents=n_agents,
-        init_capacity=init_capacity,
+        init_capacity=[init_capacity],
         g=g,
         s=s,
         b=b,
-        capacity_change=capacity_change_func)
+        capacity_change=[capacity_change_func])
     agents = []
     for i in range(0, n_agents):
         agents.append(EGreedyAgent(action_space=env.action_space,
@@ -111,9 +97,6 @@ def simulate_egreedy(visualise=False,
 
 
 def multiple_bars(visualise=False,
-                  g=10,
-                  s=5,
-                  b=1,
                   learning_rate=1,
                   retention_rate=0.02006827976496192,
                   initial_epsilon=0.5,
@@ -122,10 +105,7 @@ def multiple_bars(visualise=False,
     env = MultipleBarsEnv(
         n_agents=n_agents,
         init_capacity=[70, 15],
-        g=g,
-        s=s,
-        b=b,
-        capacity_change=[no_capacity_change, no_capacity_change])
+        capacity_change=[capacity_changes.no_capacity_change, capacity_changes.no_capacity_change])
     agents = []
     for i in range(0, n_agents):
         agents.append(EGreedyAgent(action_space=env.action_space,
@@ -138,9 +118,10 @@ def multiple_bars(visualise=False,
                                    }))
     for i in range(0, iterations):
         iterate(agents, env)
-    env.plot_attendance_and_capacity(iterations)
+    if visualise:
+        env.plot_attendance_and_capacity(iterations)
     return env.mse()
 
 
 if __name__ == '__main__':
-    print(multiple_bars())
+    print(multiple_bars(True))

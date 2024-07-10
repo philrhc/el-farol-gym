@@ -9,11 +9,17 @@ import numpy as np
 
 
 def squared(a, b):
-    return ((np.array(a) - np.array(b) ** 2))
+    return np.array(a) - np.array(b) ** 2
 
 
 class MultipleBarsEnv(VectorEnv):
-    def __init__(self, n_agents, init_capacity, g, s, b, capacity_change):
+    def __init__(self,
+                 n_agents,
+                 init_capacity,
+                 capacity_change,
+                 g=10,
+                 s=5,
+                 b=1):
         observation_space = Box(low=0, high=n_agents, dtype=np.int8)
         action_space = Box(low=0, high=1, dtype=np.int8)
         super().__init__(len(init_capacity), observation_space, action_space)
@@ -68,7 +74,6 @@ class MultipleBarsEnv(VectorEnv):
         t = np.arange(0, iterations, 1)
         fig, axs = plt.subplots(nrows=self.num_envs, ncols=2, layout='constrained')
         for i in range(self.num_envs):
-
             axs[i][0].plot(t, self.attendances[i])
             axs[i][0].plot(t, self.capacities[i])
             axs[i][0].set(xlabel='timesteps', ylabel="number of agents", title="Attendance/Capacity")
@@ -80,4 +85,3 @@ class MultipleBarsEnv(VectorEnv):
             axs[i][1].grid()
 
         plt.show()
-

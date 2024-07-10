@@ -9,15 +9,15 @@ class OneChange:
     def __init__(self, iterations):
         def func(env, i):
             if env.i == int(iterations / 2):
-                env.modify_capacity(50, i)
+                env.modify_capacity(i, 50)
         self.func = func
 
 
 class RandomChanges:
-    def __init__(self, change_chance, change_limit):
+    def __init__(self, chance, limit):
         def func(env, i):
             if env.i % 50 == 0 and env.i > 0:
-                if random.random() < change_chance:
-                    change = (random.random() - 0.5) * change_limit
-                    env.modify_capacity_by_percentage(change, i)
+                if random.random() < chance:
+                    change = (random.random() - 0.5) * limit
+                    env.modify_capacity_by_percentage(i, change)
         self.func = func

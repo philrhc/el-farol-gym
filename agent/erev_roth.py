@@ -26,8 +26,8 @@ class ErevRothAgent(object):
         return actions
 
     def learn(self, reward):
-        for i, each in enumerate(reward):
+        for i, each_reward in enumerate(reward):
             other_action = 1 - self.prev_actions[i]
             self.q[i][self.prev_actions[i]] = ((1 - self.config["phi"]) * self.q[i][self.prev_actions[i]]
-                                               + each * (1 - self.config["epsilon"]))
-            self.q[i][other_action] = (1 - self.config["phi"]) * self.q[i][other_action] + each * self.config["epsilon"]
+                                               + each_reward * (1 - self.config["epsilon"]))
+            self.q[i][other_action] = (1 - self.config["phi"]) * self.q[i][other_action] + each_reward * self.config["epsilon"]

@@ -43,7 +43,7 @@ class MultipleBarsEnv(VectorEnv):
         self.reward_func = reward_func
 
     def modify_capacity_by_percentage(self, index, percentage_change):
-        self.capacity[index] = int(self.capacity + self.capacity * percentage_change)
+        self.capacity[index] = int(self.capacity[index] + self.capacity[index] * percentage_change)
 
     def modify_capacity(self, index, new):
         self.capacity[index] = new
@@ -73,15 +73,23 @@ class MultipleBarsEnv(VectorEnv):
     def plot_attendance_and_capacity(self, iterations):
         t = np.arange(0, iterations, 1)
         fig, axs = plt.subplots(nrows=self.num_envs, ncols=2, layout='constrained')
-        for i in range(self.num_envs):
-            axs[i][0].plot(t, self.attendances[i])
-            axs[i][0].plot(t, self.capacities[i])
-            axs[i][0].set(xlabel='timesteps', ylabel="number of agents", title="Attendance/Capacity")
-            axs[i][0].grid()
 
-            squared_error = squared(self.attendances[i], self.capacities[i])
-            axs[i][1].plot(t, squared_error)
-            axs[i][1].set(title="Squared Error", xlabel='timesteps')
-            axs[i][1].grid()
+        def plot(attendance_capacity_graph, mse_graph, index):
+            attendance_capacity_graph.plot(t, self.attendances[index])
+            attendance_capacity_graph.plot(t, self.capacities[index])
+            attendance_capacity_graph.set(xlabel='timesteps', ylabel="number of agents", title="Attendance/Capacity")
+            attendance_capacity_graph.grid()
+
+            squared_error = squared(self.attendances[index], self.capacities[index])
+            mse_graph.plot(t, squared_error)
+            mse_graph.set(title="Squared Error", xlabel='timesteps')
+            mse_graph.grid()
+
+        if self.num_envs == 1:
+            plot(axs[0], axs[1], 0)
+        else:
+            for i in range(self.num_envs):
+                plot(axs[i][0], axs[i][1], i)
 
         plt.show()
+

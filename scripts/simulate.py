@@ -11,9 +11,6 @@ import hyperparams
 
 iterations = 10_000
 n_agents = 100
-init_capacity = 70
-capacity_change_chance = 0.2
-capacity_change_limit = 0.3
 
 
 def iterate(agents, env):
@@ -30,11 +27,12 @@ def iterate(agents, env):
 
 def simulate(visualise=False,
              agent_type=EGreedyAgent,
-             config=hyperparams.e_greedy_optimal):
-    env = MultipleBarsEnv(
-        n_agents=n_agents,
-        init_capacity=[70, 15],
-        capacity_change=[capacity_changes.no_capacity_change, capacity_changes.no_capacity_change])
+             config=hyperparams.e_greedy_optimal,
+             init_capacities=[70, 15],
+             capacity_change_functions=[capacity_changes.no_capacity_change, capacity_changes.no_capacity_change]):
+    env = MultipleBarsEnv(n_agents=n_agents,
+                          init_capacity=init_capacities,
+                          capacity_change=capacity_change_functions)
     agents = [agent_type(action_space=env.action_space, config=config) for _ in range(0, n_agents)]
     [iterate(agents, env) for _ in range(0, iterations)]
     if visualise:
@@ -43,4 +41,11 @@ def simulate(visualise=False,
 
 
 if __name__ == '__main__':
-    print(simulate(True, ErevRothAgent, hyperparams.erev_roth_optimal))
+    random_changes = capacity_changes.RandomChanges(chance=0.2, limit=0.3)
+    more_random_changes = capacity_changes.RandomChanges(chance=0.05, limit=0.5)
+    mse = simulate(visualise=True,
+                   agent_type=EGreedyAgent,
+                   config=hyperparams.e_greedy_optimal,
+                   init_capacities=[70, 15],
+                   capacity_change_functions=[random_changes.func, more_random_changes.func])
+    print(mse)

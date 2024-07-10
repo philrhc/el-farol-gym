@@ -90,11 +90,11 @@ def simulate_egreedy(visualise=False,
                      sg=9.38,
                      sb=2.739760371150226,
                      b=1.6782890889750117,
-                     learning_rate=0.8769506278547066,
-                     retention_rate=0.27681798313910244,
-                     initial_epsilon=0.48904103108688907,
-                     epsilon_decay=0.014380608025918491,
-                     final_epsilon=0):
+                     learning_rate=1,
+                     retention_rate=0.02006827976496192,
+                     initial_epsilon=0.5,
+                     epsilon_decay=0.00698608772471109,
+                     final_epsilon=0.17041582725849416):
     env = ElFarolEnv(
         n_agents=n_agents,
         init_capacity=init_capacity,
@@ -117,4 +117,4 @@ def simulate_egreedy(visualise=False,
 
 
 if __name__ == '__main__':
-    print(simulate_egreedy(True, random_threshold_changes))
+    print(simulate_erevroth(True, random_threshold_changes))

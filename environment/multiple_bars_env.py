@@ -8,6 +8,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+def squared(a, b):
+    return ((np.array(a) - np.array(b) ** 2))
+
+
 class MultipleBarsEnv(VectorEnv):
     def __init__(self, n_agents, init_capacity, g, s, b, capacity_change):
         observation_space = Box(low=0, high=n_agents, dtype=np.int8)
@@ -22,10 +26,10 @@ class MultipleBarsEnv(VectorEnv):
         self.attendances = [[] for _ in range(len(init_capacity))]
         self.capacities = [[] for _ in range(len(init_capacity))]
 
-        def reward_func(action, n_attended):
+        def reward_func(action, n_attended, capacity):
             if action == 0:
                 return s
-            elif n_attended <= self.capacity:
+            elif n_attended <= capacity:
                 return g
             else:
                 return b
@@ -43,7 +47,7 @@ class MultipleBarsEnv(VectorEnv):
         observations = []
         for i in range(self.num_envs):
             n_attended = sum(actions[i])
-            reward = [self.reward_func(a, n_attended) for a in actions[i]]
+            reward = [self.reward_func(a, n_attended, self.capacity[i]) for a in actions[i]]
             self.attendances[i].append(n_attended)
             self.capacities[i].append(self.capacity[i])
             self.capacity_change[i](self, i)
@@ -51,23 +55,29 @@ class MultipleBarsEnv(VectorEnv):
         return observations
 
     def mse(self):
-        squared_error = ((np.array(self.attendances[0]) - np.array(self.capacities[0])) ** 2)
-        sum = 0
-        for each in squared_error:
-            sum += each
-        return sum / len(squared_error)
+        total = 0
+        for i in range(self.num_envs):
+            squared_error = squared(self.attendances[i], self.capacities[i])
+            sum = 0
+            for each in squared_error:
+                sum += each
+            total += sum / len(squared_error)
+        return total
 
     def plot_attendance_and_capacity(self, iterations):
         t = np.arange(0, iterations, 1)
-        fig, axs = plt.subplots(2, 1, layout='constrained')
-        axs[0].plot(t, self.attendances[0])
-        axs[0].plot(t, self.capacities[0])
-        axs[0].set(xlabel='timesteps', ylabel="number of agents", title="Attendance/Capacity")
-        axs[0].grid()
+        fig, axs = plt.subplots(nrows=self.num_envs, ncols=2, layout='constrained')
+        for i in range(self.num_envs):
 
-        squared_error = ((np.array(self.attendances[0]) - np.array(self.capacities[0])) ** 2)
-        axs[1].plot(t, squared_error)
-        axs[1].set(title="Squared Error", xlabel='timesteps')
-        axs[1].grid()
+            axs[i][0].plot(t, self.attendances[i])
+            axs[i][0].plot(t, self.capacities[i])
+            axs[i][0].set(xlabel='timesteps', ylabel="number of agents", title="Attendance/Capacity")
+            axs[i][0].grid()
+
+            squared_error = squared(self.attendances[i], self.capacities[i])
+            axs[i][1].plot(t, squared_error)
+            axs[i][1].set(title="Squared Error", xlabel='timesteps')
+            axs[i][1].grid()
 
         plt.show()
+

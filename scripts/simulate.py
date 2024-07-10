@@ -1,7 +1,6 @@
 import random
 
 import numpy as np
-from gymnasium.spaces import Box
 
 from agent.e_greedy import EGreedyAgent
 from agent.simple_erev_roth import SimpleErevRothAgent
@@ -97,13 +96,13 @@ def simulate_egreedy(visualise=False,
     agents = []
     for i in range(0, n_agents):
         agents.append(EGreedyAgent(action_space=env.action_space,
-                         config={
-                             "learning_rate": learning_rate,  # Reward multiplier
-                             "retention_rate": retention_rate,  # Forget some past experience
-                             "initial_epsilon": initial_epsilon,  # Exploration probability
-                             "epsilon_decay": epsilon_decay,  # Exploration reduction over time
-                             "final_epsilon": final_epsilon  # Final exploration probability
-                         }))
+                                   config={
+                                       "learning_rate": learning_rate,  # Reward multiplier
+                                       "retention_rate": retention_rate,  # Forget some past experience
+                                       "initial_epsilon": initial_epsilon,  # Exploration probability
+                                       "epsilon_decay": epsilon_decay,  # Exploration reduction over time
+                                       "final_epsilon": final_epsilon  # Final exploration probability
+                                   }))
     for i in range(0, iterations):
         iterate(agents, env)
     if visualise:
@@ -111,28 +110,37 @@ def simulate_egreedy(visualise=False,
     return env.mse()
 
 
-def multiple_bars():
+def multiple_bars(visualise=False,
+                  g=10,
+                  s=5,
+                  b=1,
+                  learning_rate=1,
+                  retention_rate=0.02006827976496192,
+                  initial_epsilon=0.5,
+                  epsilon_decay=0.00698608772471109,
+                  final_epsilon=0.17041582725849416):
     env = MultipleBarsEnv(
         n_agents=n_agents,
-        init_capacity=[5],
-        g=10,
-        s=5,
-        b=1,
-        capacity_change=[no_capacity_change])
+        init_capacity=[70, 15],
+        g=g,
+        s=s,
+        b=b,
+        capacity_change=[no_capacity_change, no_capacity_change])
     agents = []
-    for i in range(0, 2):
+    for i in range(0, n_agents):
         agents.append(EGreedyAgent(action_space=env.action_space,
                                    config={
-                                       "learning_rate": 1,  # Reward multiplier
-                                       "retention_rate": 1,  # Forget some past experience
-                                       "initial_epsilon": 1,  # Exploration probability
-                                       "epsilon_decay": 0,  # Exploration reduction over time
-                                       "final_epsilon": 1  # Final exploration probability
+                                       "learning_rate": learning_rate,  # Reward multiplier
+                                       "retention_rate": retention_rate,  # Forget some past experience
+                                       "initial_epsilon": initial_epsilon,  # Exploration probability
+                                       "epsilon_decay": epsilon_decay,  # Exploration reduction over time
+                                       "final_epsilon": final_epsilon  # Final exploration probability
                                    }))
     for i in range(0, iterations):
         iterate(agents, env)
     env.plot_attendance_and_capacity(iterations)
     return env.mse()
+
 
 if __name__ == '__main__':
     print(multiple_bars())

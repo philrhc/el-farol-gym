@@ -22,7 +22,6 @@ def run_simulation(params):
         simulate.one_threshold_change,
         10,
         5,
-        5,
         1,
         params["learning_rate"],
         params["epsilon"],

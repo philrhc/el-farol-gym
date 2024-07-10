@@ -7,19 +7,18 @@ import numpy as np
 
 
 class ElFarolEnv(Env):
-    def __init__(self, n_agents, init_capacity, g, sg, sb, b):
+    def __init__(self, n_agents, init_capacity, g, s, b, capacity_change):
+        self.i = 0
         self.n_agents = n_agents
         self.action_space = Discrete(2) # used by agents when sampling action space
         self.capacity = init_capacity
+        self.capacity_change = capacity_change
         self.attendances = []
         self.capacities = []
 
         def reward_func(action, n_attended):
             if action == 0:
-                if n_attended >= self.capacity:
-                    return sg
-                if n_attended < self.capacity:
-                    return sb
+                return s
             elif n_attended <= self.capacity:
                 return g
             else:
@@ -27,17 +26,19 @@ class ElFarolEnv(Env):
 
         self.reward_func = reward_func
 
-    def modify_capacity_by_percentage(self, percentage_change):
+    def modify_capacity_by_percentage(self, percentage_change, index):
         self.capacity = int(self.capacity + self.capacity * percentage_change)
 
-    def modify_capacity(self, new):
+    def modify_capacity(self, index, new):
         self.capacity = new
 
     def step(self, action):
+        self.i += 1
         n_attended = sum(action)
         reward = [self.reward_func(a, n_attended) for a in action]
         self.attendances.append(n_attended)
         self.capacities.append(self.capacity)
+        self.capacity_change(self)
         return n_attended, reward, False, ()
 
     def mse(self):

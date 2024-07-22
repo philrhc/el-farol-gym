@@ -16,7 +16,14 @@ class ElFarolEnv(Env):
         self.attendances = []
         self.capacities = []
 
-        def reward_func(action, n_attended):
+        def threshold_reward_func(action, n_attended):
+            if n_attended <= self.capacity:
+                return g
+            else:
+                return b
+
+        # 0 = stay at home, 1 = attend
+        def attending_reward_func(action, n_attended):
             if action == 0:
                 return s
             elif n_attended <= self.capacity:
@@ -24,7 +31,7 @@ class ElFarolEnv(Env):
             else:
                 return b
 
-        self.reward_func = reward_func
+        self.reward_func = attending_reward_func
 
     def modify_capacity_by_percentage(self, percentage_change, index):
         self.capacity = int(self.capacity + self.capacity * percentage_change)

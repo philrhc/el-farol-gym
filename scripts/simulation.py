@@ -1,5 +1,3 @@
-import random
-
 import numpy as np
 
 from agent.e_greedy import EGreedyAgent

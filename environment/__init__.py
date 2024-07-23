@@ -1,7 +1,7 @@
 from gym.envs.registration import register
-from environment.el_farol_env import ElFarolEnv
 from environment.pure_nash_equilibria import FuzzyPureNash
-from environment.multiple_bars_env import MultipleBarsEnv
+from environment.el_farol import MultipleBarsEnv
+from environment.reward_functions import AttendanceRewardFunc, ThresholdRewardFunc
 
 register(
     id='ElFarolEnv-v0',

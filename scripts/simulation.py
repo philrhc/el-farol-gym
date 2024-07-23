@@ -3,7 +3,7 @@ import numpy as np
 from agent.e_greedy import EGreedyAgent
 from agent.simple_erev_roth import SimpleErevRothAgent
 from agent.erev_roth import ErevRothAgent
-from environment import ElFarolEnv, MultipleBarsEnv
+from environment import MultipleBarsEnv, AttendanceRewardFunc, ThresholdRewardFunc
 import capacity_changes
 import hyperparams
 
@@ -27,10 +27,12 @@ def simulate(visualise=False,
              agent_type=EGreedyAgent,
              config=hyperparams.e_greedy_optimal,
              init_capacities=[70, 15],
-             capacity_change_functions=[capacity_changes.no_capacity_change, capacity_changes.no_capacity_change]):
+             capacity_change_functions=[capacity_changes.no_capacity_change, capacity_changes.no_capacity_change],
+             reward_func=AttendanceRewardFunc):
     env = MultipleBarsEnv(n_agents=n_agents,
                           init_capacity=init_capacities,
-                          capacity_change=capacity_change_functions)
+                          capacity_change=capacity_change_functions,
+                          reward_func=reward_func)
     agents = [agent_type(action_space=env.action_space, config=config) for _ in range(0, n_agents)]
     [iterate(agents, env) for _ in range(0, iterations)]
     if visualise:
@@ -45,5 +47,6 @@ if __name__ == '__main__':
                    agent_type=EGreedyAgent,
                    config=hyperparams.e_greedy_optimal,
                    init_capacities=[70, 15],
-                   capacity_change_functions=[random_changes.func, more_random_changes.func])
+                   capacity_change_functions=[random_changes.func, more_random_changes.func],
+                   reward_func=AttendanceRewardFunc)
     print(mse)

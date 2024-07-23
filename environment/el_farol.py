@@ -1,7 +1,4 @@
 from __future__ import print_function
-
-import gymnasium as gym
-import numpy
 from gymnasium.vector import VectorEnv
 from gymnasium.spaces import Discrete, Box
 import matplotlib.pyplot as plt
@@ -17,6 +14,7 @@ class MultipleBarsEnv(VectorEnv):
                  n_agents,
                  init_capacity,
                  capacity_change,
+                 reward_func,
                  g=10,
                  s=5,
                  b=1):
@@ -31,16 +29,7 @@ class MultipleBarsEnv(VectorEnv):
         self.capacity_change = capacity_change
         self.attendances = [[] for _ in range(len(init_capacity))]
         self.capacities = [[] for _ in range(len(init_capacity))]
-
-        def reward_func(action, n_attended, capacity):
-            if action == 0:
-                return s
-            elif n_attended <= capacity:
-                return g
-            else:
-                return b
-
-        self.reward_func = reward_func
+        self.reward_func = reward_func(g, s, b).fn
 
     def modify_capacity_by_percentage(self, index, percentage_change):
         self.capacity[index] = int(self.capacity[index] + self.capacity[index] * percentage_change)
@@ -92,4 +81,3 @@ class MultipleBarsEnv(VectorEnv):
                 plot(axs[i][0], axs[i][1], i)
 
         plt.show()
-

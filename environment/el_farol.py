@@ -1,6 +1,7 @@
 from __future__ import print_function
 from gymnasium.vector import VectorEnv
-from gymnasium.spaces import Discrete, Box
+from gymnasium.spaces import Box
+from queue import SimpleQueue, Queue
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -9,12 +10,21 @@ def squared(a, b):
     return np.square(np.array(a) - np.array(b))
 
 
+def initialise_reward_queue(n_agents, n_envs, delay):
+    reward_queues = [SimpleQueue() for _ in range(n_envs)]
+    for i in range(n_envs):
+        for _ in range(delay):
+            reward_queues[i].put(np.zeros(n_agents))
+    return reward_queues
+
+
 class MultipleBarsEnv(VectorEnv):
     def __init__(self,
                  n_agents,
                  init_capacity,
                  capacity_change,
                  reward_func,
+                 reward_delay=0,
                  g=10,
                  s=5,
                  b=1):
@@ -22,14 +32,15 @@ class MultipleBarsEnv(VectorEnv):
         action_space = Box(low=0, high=1, dtype=np.int8)
         super().__init__(len(init_capacity), observation_space, action_space)
         if len(init_capacity) != len(capacity_change):
-            raise Exception("init capacities and change not equal")
+            raise Exception("init capacities and capacity change functions not equal size")
+        n_envs = len(init_capacity)
         self.i = 0
-        self.n_agents = n_agents
         self.capacity = init_capacity
         self.capacity_change = capacity_change
-        self.attendances = [[] for _ in range(len(init_capacity))]
-        self.capacities = [[] for _ in range(len(init_capacity))]
+        self.attendances = [[] for _ in range(n_envs)]
+        self.capacities = [[] for _ in range(n_envs)]
         self.reward_func = reward_func(g, s, b).fn
+        self.reward_queue = initialise_reward_queue(n_agents, n_envs, reward_delay)
 
     def modify_capacity_by_percentage(self, index, percentage_change):
         self.capacity[index] = int(self.capacity[index] + self.capacity[index] * percentage_change)
@@ -43,10 +54,12 @@ class MultipleBarsEnv(VectorEnv):
         for i in range(self.num_envs):
             n_attended = sum(actions[i])
             reward = [self.reward_func(a, n_attended, self.capacity[i]) for a in actions[i]]
+            self.reward_queue[i].put(reward)
+            observed_reward = self.reward_queue[i].get()
+            observations.append((n_attended, observed_reward, False, ()))
             self.attendances[i].append(n_attended)
             self.capacities[i].append(self.capacity[i])
             self.capacity_change[i](self, i)
-            observations.append((n_attended, reward, False, ()))
         return observations
 
     def mse(self):

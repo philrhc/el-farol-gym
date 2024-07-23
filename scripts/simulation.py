@@ -28,11 +28,13 @@ def simulate(visualise=False,
              config=hyperparams.e_greedy_optimal,
              init_capacities=[70, 15],
              capacity_change_functions=[capacity_changes.no_capacity_change, capacity_changes.no_capacity_change],
-             reward_func=AttendanceRewardFunc):
+             reward_func=AttendanceRewardFunc,
+             reward_delay=0):
     env = MultipleBarsEnv(n_agents=n_agents,
                           init_capacity=init_capacities,
                           capacity_change=capacity_change_functions,
-                          reward_func=reward_func)
+                          reward_func=reward_func,
+                          reward_delay=reward_delay)
     agents = [agent_type(action_space=env.action_space, config=config) for _ in range(0, n_agents)]
     [iterate(agents, env) for _ in range(0, iterations)]
     if visualise:
@@ -44,9 +46,10 @@ if __name__ == '__main__':
     random_changes = capacity_changes.RandomChanges(chance=0.2, limit=0.3)
     more_random_changes = capacity_changes.RandomChanges(chance=0.05, limit=0.5)
     mse = simulate(visualise=True,
-                   agent_type=EGreedyAgent,
-                   config=hyperparams.e_greedy_optimal,
-                   init_capacities=[70, 15],
-                   capacity_change_functions=[random_changes.func, more_random_changes.func],
-                   reward_func=AttendanceRewardFunc)
+                   agent_type=ErevRothAgent,
+                   config=hyperparams.erev_roth_optimal,
+                   init_capacities=[70],
+                   capacity_change_functions=[capacity_changes.no_capacity_change],
+                   reward_func=AttendanceRewardFunc,
+                   reward_delay=0)
     print(mse)

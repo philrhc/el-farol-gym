@@ -3,11 +3,11 @@ import numpy as np
 from agent.e_greedy import EGreedyAgent
 from agent.simple_erev_roth import SimpleErevRothAgent
 from agent.erev_roth import ErevRothAgent
-from environment import MultipleBarsEnv, AttendanceRewardFunc, ThresholdRewardFunc
 import capacity_changes
 import hyperparams
+from environment import reward_functions, MultipleBarsEnv
 
-iterations = 10_000
+iterations = 100_000
 n_agents = 100
 
 
@@ -28,7 +28,7 @@ def simulate(visualise=False,
              config=hyperparams.e_greedy_optimal,
              init_capacities=[70, 15],
              capacity_change_functions=[capacity_changes.no_capacity_change, capacity_changes.no_capacity_change],
-             reward_func=AttendanceRewardFunc,
+             reward_func=reward_functions.ElFarolRewardFunc,
              reward_delay=0):
     env = MultipleBarsEnv(n_agents=n_agents,
                           init_capacity=init_capacities,
@@ -43,13 +43,11 @@ def simulate(visualise=False,
 
 
 if __name__ == '__main__':
-    random_changes = capacity_changes.RandomChanges(chance=0.2, limit=0.3)
-    more_random_changes = capacity_changes.RandomChanges(chance=0.05, limit=0.5)
     mse = simulate(visualise=True,
-                   agent_type=ErevRothAgent,
-                   config=hyperparams.erev_roth_optimal,
-                   init_capacities=[70],
-                   capacity_change_functions=[capacity_changes.no_capacity_change],
-                   reward_func=AttendanceRewardFunc,
+                   agent_type=EGreedyAgent,
+                   config=hyperparams.e_greedy_td_exp_decay,
+                   init_capacities=[60],
+                   capacity_change_functions=[capacity_changes.OneChange(50000, 40).func],
+                   reward_func=reward_functions.ExponentialDecayRewardFunc,
                    reward_delay=0)
     print(mse)

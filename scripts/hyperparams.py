@@ -7,8 +7,16 @@ e_greedy_optimal = {
 }
 
 erev_roth_optimal = {
-    "learning_rate":0.001,
-    "phi":0.4028566874373059,
-    "epsilon":0.003955266345682853,
-    "retention_rate":1
+    "learning_rate": 0.001,
+    "phi": 0.4028566874373059,
+    "epsilon": 0.003955266345682853,
+    "retention_rate": 1
+}
+
+e_greedy_td_exp_decay = {
+    "learning_rate": 0.5,
+    "retention_rate": 0.9,
+    "initial_epsilon": 0.5,
+    "epsilon_decay": 0.01,
+    "final_epsilon": 0.01
 }

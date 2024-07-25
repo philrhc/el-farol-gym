@@ -20,12 +20,13 @@ egreedy_search_space.append(Real(0, 0.33, name="final_epsilon"))
 
 
 def e_greedy_config(params):
-    return {"learning_rate": params["learning_rate"],  # Reward multiplier
-            "retention_rate": params["retention_rate"],  # Forget some past experience
-            "initial_epsilon": params["initial_epsilon"],  # Exploration probability
-            "epsilon_decay": params["initial_epsilon"],  # Exploration reduction over time
-            "final_epsilon": params["initial_epsilon"]  # Final exploration probability
-            }
+    return {
+        "learning_rate": params["learning_rate"],  # Reward multiplier
+        "retention_rate": params["retention_rate"],  # Forget some past experience
+        "initial_epsilon": params["initial_epsilon"],  # Exploration probability
+        "epsilon_decay": params["initial_epsilon"],  # Exploration reduction over time
+        "final_epsilon": params["initial_epsilon"]  # Final exploration probability
+    }
 
 
 def run_simulation(params):
@@ -39,6 +40,7 @@ def run_simulation(params):
 
 @use_named_args(egreedy_search_space)
 def evaluate_model(**params):
+    print("using: ", params)
     scores = []
 
     for x in range(10):
@@ -56,7 +58,7 @@ def run():
     )
 
     print("Best Accuracy: %.3f" % (1.0 - result.fun))
-    print("Best Parameters: %s" % (result.x))
+    print("Best Parameters: %s" % (result))
 
 
 if __name__ == '__main__':

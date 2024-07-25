@@ -6,10 +6,10 @@ def no_capacity_change(env, i):
 
 
 class OneChange:
-    def __init__(self, iterations):
+    def __init__(self, iterations, final_value):
         def func(env, i):
             if env.i == int(iterations / 2):
-                env.modify_capacity(i, 50)
+                env.modify_capacity(i, final_value)
         self.func = func
 
 

@@ -34,8 +34,8 @@ def run_simulation(params):
     return simulation.simulate(visualise=False,
                                agent_type=EGreedyAgent,
                                config=e_greedy_config(params),
-                               init_capacities=[70],
-                               capacity_change_functions=[random_changes.func])
+                               init_capacity=[70],
+                               capacity_change_function=[random_changes.func])
 
 
 @use_named_args(egreedy_search_space)

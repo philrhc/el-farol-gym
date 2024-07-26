@@ -13,26 +13,22 @@ n_agents = 100
 
 def iterate(agents, env):
     actions = [a.act() for a in agents]
-    transposed = np.transpose(actions)
-    step = env.step(transposed)
-    for agent_index, agent in enumerate(agents):
-        reward_array = []
-        for observations, rewards, _, _, in step:
-            reward_array.append(rewards[agent_index])
-        agent.learn(reward_array)
+    observations, reward, _, _ = env.step(actions)
+    for agent, reward in zip(agents, reward):
+        agent.learn(reward)
     return actions
 
 
 def simulate(visualise=False,
              agent_type=EGreedyAgent,
              config=hyperparams.e_greedy_optimal,
-             init_capacities=[70, 15],
-             capacity_change_functions=[capacity_changes.no_capacity_change, capacity_changes.no_capacity_change],
+             init_capacity=70,
+             capacity_change_function=capacity_changes.no_capacity_change,
              reward_func=reward_functions.ElFarolRewardFunc,
              reward_delay=0):
     env = MultipleBarsEnv(n_agents=n_agents,
-                          init_capacity=init_capacities,
-                          capacity_change=capacity_change_functions,
+                          init_capacity=init_capacity,
+                          capacity_change=capacity_change_function,
                           reward_func=reward_func,
                           reward_delay=reward_delay)
     agents = [agent_type(action_space=env.action_space, config=config) for _ in range(0, n_agents)]
@@ -46,8 +42,8 @@ if __name__ == '__main__':
     mse = simulate(visualise=True,
                    agent_type=EGreedyAgent,
                    config=hyperparams.e_greedy_td_exp_decay,
-                   init_capacities=[40],
-                   capacity_change_functions=[capacity_changes.OneChange(50000, 60).func],
+                   init_capacity=40,
+                   capacity_change_function=capacity_changes.OneChange(50000, 60).func,
                    reward_func=reward_functions.ExponentialDecayRewardFunc,
                    reward_delay=0)
     print(mse)

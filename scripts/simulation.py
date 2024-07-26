@@ -46,8 +46,8 @@ if __name__ == '__main__':
     mse = simulate(visualise=True,
                    agent_type=EGreedyAgent,
                    config=hyperparams.e_greedy_td_exp_decay,
-                   init_capacities=[60],
-                   capacity_change_functions=[capacity_changes.OneChange(50000, 40).func],
+                   init_capacities=[40],
+                   capacity_change_functions=[capacity_changes.OneChange(50000, 60).func],
                    reward_func=reward_functions.ExponentialDecayRewardFunc,
                    reward_delay=0)
     print(mse)
